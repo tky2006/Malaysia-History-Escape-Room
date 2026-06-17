@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ Malaysia History · Escape Room</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #0d1b1a;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            padding: 1rem;
+        }
+
+        .game-container {
+            background: #1d2f2c;
+            border-radius: 3.5rem;
+            padding: 2rem 2rem 1.8rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 3px #b8945c;
+            max-width: 820px;
+            width: 100%;
+        }
+
+        .screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 500px;
+            padding: 0.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #f7e3b2;
+            text-shadow: 0 4px 0 #5f3f1a, 0 6px 12px rgba(0,0,0,0.6);
+            letter-spacing: 2px;
+            margin-bottom: 0.2rem;
+        }
+
+        .subhead {
+            color: #c5d6c0;
+            background: rgba(0,0,0,0.4);
+            padding: 0.3rem 2rem;
+            border-radius: 60px;
+            border: 1px solid #b8945c;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .big-icon {
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 0.2rem;
+        }
+
+        .instruction-box {
+            background: rgba(10, 25, 22, 0.85);
+            border-radius: 2.5rem;
+            padding: 1.5rem 2rem;
+            border-left: 8px solid #dbb47a;
+            color: #e6f0e0;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            text-align: left;
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(4px);
+            margin: 0.8rem 0 1.8rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+
+        .instruction-box ul {
+            list-style: none;
+            padding-left: 0.2rem;
+        }
+
+        .instruction-box li {
+            padding: 0.2rem 0;
+            border-bottom: 1px dashed #3f5e52;
+        }
+        .instruction-box li:last-child { border: none; }
+        .instruction-box span {
+            background: #dbb47a;
+            color: #1a2d26;
+            font-weight: 700;
+            padding: 0 12px;
+            border-radius: 30px;
+            margin-right: 10px;
+        }
+
+        .btn {
+            background: #dbb47a;
+            border: none;
+            padding: 0.9rem 3rem;
+            border-radius: 60px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2e28;
+            box-shadow: 0 8px 0 #7a5f3a, 0 8px 20px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.08s linear;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 0.2rem;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #5f482b;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: 0 4px 0 #5f482b;
+            pointer-events: none;
+        }
+
+        .game-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.4);
+            padding: 0.5rem 1.5rem;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            margin-bottom: 1rem;
+            color: #f2efe0;
+            font-weight: 600;
+            border: 1px solid #9f8b6b;
+            gap: 6px 12px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(0,0,0,0.25);
+            padding: 0.2rem 1rem 0.2rem 0.7rem;
+            border-radius: 40px;
+            font-size: 1.1rem;
+        }
+        .stat span { font-size: 1.4rem; margin-right: 4px; }
+        .stat-value { min-width: 2rem; text-align: center; }
+
+        .stars-display {
+            background: #283b33;
+            padding: 0.2rem 1rem 0.2rem 0.8rem;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 1.6rem;
+            letter-spacing: 2px;
+        }
+
+        .room-badge {
+            background: #b8945c;
+            color: #1a2d26;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .canvas-wrapper {
+            background: #1d2d27;
+            border-radius: 2.5rem;
+            padding: 0.5rem;
+            box-shadow: inset 0 0 20px #0b1814;
+            border: 2px solid #b8945c;
+            margin: 0.5rem 0 0.8rem;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 600 / 400;
+            background: #1f332b;
+            border-radius: 2rem;
+            cursor: none;
+            touch-action: none;
+            image-rendering: pixelated;
+        }
+
+        .controls-hint {
+            color: #aac0b0;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0.2rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 40px;
+            margin-top: 0.2rem;
+        }
+
+        .feedback-area {
+            min-height: 2.8rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f5eace;
+            text-align: center;
+            padding: 0.4rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+            margin: 0.3rem 0 0.2rem;
+        }
+
+        .end-stats {
+            background: rgba(10, 25, 20, 0.85);
+            backdrop-filter: blur(6px);
+            padding: 1.5rem 1.8rem;
+            border-radius: 3rem;
+            width: 100%;
+            max-width: 450px;
+            color: #f0eee0;
+            margin: 0.5rem 0 1.5rem;
+        }
+        .end-stats p {
+            font-size: 1.4rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid #49665a;
+        }
+        .end-stats p:last-child { border: none; }
+        .end-stars {
+            font-size: 3rem;
+            letter-spacing: 10px;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- START SCREEN -->
+    <div id="startScreen" class="screen">
+        <div class="big-icon">🏛️</div>
+        <h1>ESCAPE ROOM</h1>
+        <div class="subhead">🇲🇾 Malaysia History · 10 rooms · 100 facts</div>
+        <div class="instruction-box">
+            <ul>
+                <li><span>🟢</span> Move with <strong>WASD</strong> or <strong>Arrow keys</strong></li>
+                <li><span>📜</span> Collect <strong>10 orbs</strong> in each room to unlock the exit</li>
+                <li><span>👹</span> Avoid <strong>2 enemies</strong> — they move slowly</li>
+                <li><span>❤️</span> 5 lives · enemy touch = -1 life</li>
+                <li><span>⭐</span> Stars based on total orbs collected</li>
+                <li><span>🚪</span> Collect all 10 orbs to advance to the next room!</li>
+            </ul>
+        </div>
+        <button class="btn" id="startBtn">▶ PLAY</button>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" class="screen hidden">
+        <div class="game-header">
+            <div class="stat"><span>❤️</span> <span class="stat-value" id="livesDisplay">5</span></div>
+            <div class="stat"><span>📜</span> <span class="stat-value" id="orbCount">0 / 10</span></div>
+            <div class="room-badge" id="roomDisplay">Room 1</div>
+            <div class="stars-display" id="starsDisplay">☆☆☆</div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+        </div>
+        <div class="controls-hint">⬆️⬇️⬅️➡️  or  WASD</div>
+        <div class="feedback-area" id="feedbackMsg">✨ collect 10 orbs to escape this room!</div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="endScreen" class="screen hidden">
+        <div class="big-icon">🏁</div>
+        <h1 id="endTitle">GAME OVER</h1>
+        <div class="end-stats">
+            <p><span>📜 Orbs</span> <span id="finalOrbs">0 / 100</span></p>
+            <p><span>⭐ Stars</span> <span id="finalStars">☆☆☆</span></p>
+            <p><span>❤️ Lives left</span> <span id="finalLives">0</span></p>
+            <p><span>🚪 Rooms</span> <span id="finalRooms">0 / 10</span></p>
+        </div>
+        <div class="end-stars" id="finalStarsBig">☆☆☆</div>
+        <button class="btn" id="restartBtn">🔄 Play again</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ---------- SOUND & BACKGROUND MUSIC ----------
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+        }
+
+        // Helper: play tone with volume control
+        function playTone(freq, duration, type = 'sine', volume = 0.2) {
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (_) {}
+        }
+
+        // SFX: louder (volume ~0.25-0.35)
+        function soundOrb() { 
+            playTone(880, 0.2, 'sine', 0.3); 
+            setTimeout(() => playTone(1100, 0.15, 'sine', 0.25), 120); 
+        }
+        function soundHit() { playTone(200, 0.5, 'sawtooth', 0.25); }
+        function soundRoomComplete() { 
+            [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => playTone(f, 0.15, 'sine', 0.22), i * 120));
+        }
+        function soundWin() { 
+            [523, 587, 659, 784, 880, 1047].forEach((f, i) => setTimeout(() => playTone(f, 0.2, 'sine', 0.22), i * 130));
+        }
+        function soundLose() { playTone(300, 0.6, 'square', 0.2); }
+
+        // ---------- BACKGROUND MUSIC (medium volume, lower than SFX) ----------
+        let bgInterval = null;
+        function startBgMusic() {
+            stopBgMusic();
+            let noteIndex = 0;
+            // A simple, calming melody in C major
+            const melody = [523, 587, 659, 784, 659, 587, 523, 440, 523, 587, 659, 784, 880, 784, 659, 587];
+            // BG volume = 0.08 (medium-low, clearly lower than SFX which are 0.2-0.3)
+            const bgVolume = 0.18;
+            bgInterval = setInterval(() => {
+                if (!audioCtx) return;
+                const freq = melody[noteIndex % melody.length];
+                playTone(freq, 0.18, 'sine', bgVolume);
+                noteIndex++;
+            }, 380);
+        }
+
+        function stopBgMusic() {
+            if (bgInterval) {
+                clearInterval(bgInterval);
+                bgInterval = null;
+            }
+        }
+
+        // ---------- CANVAS ----------
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 600, H = 400;
+
+        // DOM refs
+        const startScreen = document.getElementById('startScreen');
+        const gameScreen = document.getElementById('gameScreen');
+        const endScreen = document.getElementById('endScreen');
+        const livesDisplay = document.getElementById('livesDisplay');
+        const orbCountDisplay = document.getElementById('orbCount');
+        const starsDisplay = document.getElementById('starsDisplay');
+        const roomDisplay = document.getElementById('roomDisplay');
+        const feedbackMsg = document.getElementById('feedbackMsg');
+        const finalOrbs = document.getElementById('finalOrbs');
+        const finalStars = document.getElementById('finalStars');
+        const finalLives = document.getElementById('finalLives');
+        const finalRooms = document.getElementById('finalRooms');
+        const finalStarsBig = document.getElementById('finalStarsBig');
+        const endTitle = document.getElementById('endTitle');
+
+        // ---------- LARGE HISTORY FACT POOL (150+ facts) ----------
+        const historyFacts = [
+            "The Malay Peninsula was home to ancient kingdoms like Langkasuka (2nd century).",
+            "Srivijaya, a powerful maritime empire, controlled the Straits of Malacca.",
+            "The Melaka Sultanate was founded in the 1400s by Parameswara.",
+            "Melaka became a major trading port attracting merchants from China, India, and Arabia.",
+            "The Malay Annals (Sejarah Melayu) chronicle the history of the Melaka Sultanate.",
+            "Islam spread to the Malay Peninsula in the 14th and 15th centuries.",
+            "The Portuguese captured Melaka in 1511, beginning colonial rule.",
+            "The Dutch took control of Melaka from the Portuguese in 1641.",
+            "The British established a trading post in Penang in 1786.",
+            "Stamford Raffles founded Singapore as a British trading port in 1819.",
+            "The British acquired Melaka from the Dutch in 1824 through the Anglo-Dutch Treaty.",
+            "The British established the Straits Settlements in 1826, comprising Penang, Melaka, and Singapore.",
+            "The Unfederated Malay States included Johor, Kedah, Kelantan, Perlis, and Terengganu.",
+            "The Federated Malay States were formed in 1895, including Perak, Selangor, Negri Sembilan, and Pahang.",
+            "The British introduced the Resident system to administer the Malay states.",
+            "The Johor Sultanate maintained relative independence under British protection.",
+            "The Malayan rubber industry boomed in the early 20th century.",
+            "Tin mining was another major industry during the colonial period.",
+            "The Malayan Communist Party was formed in 1930.",
+            "The Japanese occupied Malaya during World War II from 1942 to 1945.",
+            "The Malayan Union was established by the British in 1946 but faced strong opposition.",
+            "The Federation of Malaya was formed in 1948, replacing the Malayan Union.",
+            "The Malayan Emergency (1948-1960) was a guerrilla war against communist insurgents.",
+            "Tunku Abdul Rahman became the first Chief Minister of Malaya in 1955.",
+            "Malaya gained independence on August 31, 1957, after negotiations with the British.",
+            "The Federation of Malaysia was formed on September 16, 1963, including Malaya, Sabah, Sarawak, and Singapore.",
+            "Singapore separated from Malaysia in 1965 to become an independent nation.",
+            "The Malaysian flag, Jalur Gemilang, was first raised in 1963.",
+            "The Malaysian constitution was established in 1957 and later amended.",
+            "The Bumiputera policy was introduced in 1971 under the New Economic Policy (NEP).",
+            "The NEP aimed to reduce economic disparities among ethnic groups.",
+            "Malaysia's first Prime Minister was Tunku Abdul Rahman Putra Al-Haj.",
+            "Tun Abdul Razak became the second Prime Minister in 1970.",
+            "Hussein Onn became the third Prime Minister in 1976.",
+            "Dr. Mahathir Mohamad became the fourth Prime Minister in 1981, serving for 22 years.",
+            "The Malaysian ringgit was introduced in 1975, replacing the Malayan dollar.",
+            "The Petronas Twin Towers in Kuala Lumpur were completed in 1998.",
+            "The Kuala Lumpur International Airport (KLIA) opened in 1998.",
+            "Malaysia hosted the Commonwealth Games in 1998.",
+            "The Batu Caves are a famous Hindu shrine and tourist attraction.",
+            "Penang's George Town and Melaka City are UNESCO World Heritage sites.",
+            "Malaysia is a federal constitutional monarchy with a Yang di-Pertuan Agong as the King.",
+            "The Malaysian Parliament consists of the Dewan Rakyat and Dewan Negara.",
+            "Malaysia is a member of ASEAN (Association of Southeast Asian Nations).",
+            "The Malaysian economy has diversified from agriculture to manufacturing and services.",
+            "Malay is the national language of Malaysia, known as Bahasa Malaysia.",
+            "Islam is the official religion, but other faiths are practiced freely.",
+            "Malaysia is a multi-ethnic country with Malay, Chinese, Indian, and many indigenous groups.",
+            "The traditional Malay clothing includes the Baju Kurung and Baju Melayu.",
+            "The wau (kite) is a traditional Malaysian craft and game.",
+            "Wayang Kulit (shadow puppetry) is a traditional Malay performance art.",
+            "The silat martial art originated in the Malay archipelago.",
+            "Malaysian cuisine is diverse, featuring nasi lemak, satay, roti canai, and many more.",
+            "The Malaysian rainforest is one of the oldest in the world, home to diverse wildlife.",
+            "The orangutan is found in the rainforests of Borneo (East Malaysia).",
+            "Tunku Abdul Rahman is known as the 'Father of Independence'.",
+            "Tun Tan Cheng Lock was a prominent Malaysian Chinese leader and founder of the MCA.",
+            "Tun V.T. Sambanthan was a leader of the Malaysian Indian Congress (MIC).",
+            "The May 13 incident of 1969 was a tragic ethnic conflict in Malaysia.",
+            "The New Economic Policy (NEP) was introduced after the May 13 incident.",
+            "Dr. Mahathir Mohamad is known for his 'Look East' policy and economic reforms.",
+            "The Kuala Lumpur Tower is one of the tallest telecommunications towers in the world.",
+            "The Langkawi archipelago is a popular tourist destination.",
+            "The Cameron Highlands is a famous hill station known for tea plantations.",
+            "Malaysia has a tropical climate with two monsoon seasons.",
+            "The Sulu Sea was historically a route for trade and piracy.",
+            "The Borneo states of Sabah and Sarawak have rich indigenous cultures.",
+            "The Iban people of Sarawak are known for their warrior traditions.",
+            "The Kadazan-Dusun people of Sabah celebrate the Kaamatan harvest festival.",
+            "The Malayan tiger is a national symbol of Malaysia.",
+            "The hibiscus (Bunga Raya) is the national flower of Malaysia.",
+            "The national anthem 'Negaraku' was adopted in 1957.",
+            "The Malaysia Day celebration on September 16 marks the formation of Malaysia.",
+            "The Putrajaya administrative center was developed as the federal government hub.",
+            "The National Museum in Kuala Lumpur displays Malaysia's history and culture.",
+            "The Penang Bridge is one of the longest bridges in Southeast Asia.",
+            "The Malacca Straits is one of the busiest shipping lanes in the world.",
+            "Malaysia has a system of state sultans who rotate as the Yang di-Pertuan Agong.",
+            "The Malaysian judiciary is based on English common law.",
+            "The Malaysian education system includes national schools and vernacular schools.",
+            "The Universiti Malaya was established in 1949 and is the oldest university in Malaysia.",
+            "The Malaysian film industry has produced many acclaimed movies.",
+            "Traditional Malay music uses instruments like the gamelan, rebab, and serunai.",
+            "The Zapin dance is a traditional Malay dance with Arabic influences.",
+            "The kuda kepang is a traditional Javanese dance performed in Johor.",
+            "The Malaysian batik is a traditional textile art.",
+            "The songket is a traditional handwoven fabric with gold and silver threads.",
+            "The Malay keris is a ceremonial dagger with cultural significance.",
+            "The mangrove forests in Malaysia are important for the ecosystem.",
+            "The Malayan sun bear is the smallest bear species and found in Malaysia.",
+            "The Rafflesia flower, the largest flower in the world, is found in Malaysia.",
+            "Malaysia produces a significant amount of palm oil.",
+            "The Malaysian government promotes the 'Malaysia Truly Asia' tourism campaign.",
+            "The National Day parade is held annually on August 31 in Kuala Lumpur.",
+            "The Malaysian Armed Forces (MAF) were established in 1933.",
+            "Malaysia has a space program and launched the Angkasawan astronaut in 2007.",
+            "The Malaysian handphone penetration rate is among the highest in the region.",
+            "The Kuala Lumpur Light Rail Transit (LRT) system was introduced in the 1990s.",
+            "The SMART tunnel in Kuala Lumpur is a dual-purpose stormwater and traffic tunnel.",
+            "Malaysia is a major exporter of electronic components and semiconductors.",
+            "The Malaysian tourism industry attracts millions of visitors annually.",
+            "The Mah Meri and Temuan are indigenous peoples living in Peninsular Malaysia.",
+            "The Sarawak hornbill is the state bird of Sarawak.",
+            "The Sabah mountain (Mount Kinabalu) is the highest peak in Malaysia.",
+            "The Pahang River is the longest river in Peninsular Malaysia.",
+            "The Malaysian population is over 30 million people.",
+            "Kuala Lumpur became the capital city of Malaysia in 1963.",
+            "The Malaysian constitution guarantees freedom of religion.",
+            "The Malaysian Parliament is based on the Westminster system.",
+            "Malaysia has a monarchy with a rotating King.",
+            "The Malaysian currency is the ringgit (RM).",
+            "The Malaysian flag has 14 stripes and a 14-point star representing the states.",
+            "The Malaysian coat of arms features two tigers and a motto.",
+            "The Malayan Emergency was a significant conflict in the fight against communism.",
+            "Malaysia has a rich oral tradition with many folktales and legends.",
+            "The legend of Mahsuri is a famous folklore from Langkawi.",
+            "The Puteri Gunung Ledang is a well-known Malay legend.",
+            "The Hang Tuah and Hang Jebat story is a classic Malay epic.",
+            "The Malaysian government supports cultural preservation through various agencies.",
+            "The National Arts and Culture Festival celebrates Malaysia's heritage.",
+            "Malaysian architects have designed iconic buildings like the Petronas Towers.",
+            "The Malaysian food scene is famous for its street food.",
+            "The nasi lemak is considered the national dish of Malaysia.",
+            "The satay is a popular grilled meat dish in Malaysia.",
+            "The teh tarik is a traditional pulled tea drink.",
+            "Malaysia has many beautiful islands like Langkawi, Penang, and Redang.",
+            "The Perhentian Islands are known for their crystal-clear waters.",
+            "Malaysia has a vibrant arts and crafts scene.",
+            "The Malaysian pottery and woodcarving are traditional crafts.",
+            "The Malaysia International Fireworks Competition is a major event.",
+            "The Rainforest World Music Festival is held annually in Sarawak.",
+            "Malaysia has a strong sporting culture, with badminton being a popular sport.",
+            "The Malaysian national football team has a passionate following.",
+            "Malaysia hosted the SEA Games in 1977, 1989, 2001, and 2017.",
+            "The Malaysian tourism industry promotes eco-tourism.",
+            "The Taman Negara national park is one of the oldest rainforests in the world.",
+            "The Malaysian government has established many national parks and reserves.",
+            "Malaysia is a signatory to the Convention on Biological Diversity.",
+            "The Malaysian education system includes primary, secondary, and tertiary levels.",
+            "Malaysia has many public and private universities.",
+            "The Malaysian government provides scholarships for higher education.",
+            "Malaysia is a member of the United Nations and many international organizations.",
+            "Malaysia has diplomatic relations with most countries.",
+            "Malaysia is a non-permanent member of the UN Security Council.",
+            "Malaysia has a thriving social media and digital economy.",
+            "The Malaysian government encourages entrepreneurship and innovation.",
+            "Malaysia is a diverse and culturally rich nation with a bright future."
+        ];
+
+        // ---------- GAME STATE ----------
+        let game = {
+            player: { x: 300, y: 200, r: 12 },
+            orbs: [],
+            enemies: [],
+            collectedInRoom: 0,
+            totalCollected: 0,
+            lives: 5,
+            stars: 0,
+            currentRoom: 0,
+            totalRooms: 10,
+            orbsPerRoom: 10,
+            isRunning: false,
+            gameOver: false,
+            roomComplete: false,
+            keys: { w: false, a: false, s: false, d: false, up: false, down: false, left: false, right: false },
+            animFrame: null,
+            maxEnemies: 2,
+            usedFacts: [],
+        };
+
+        // ---------- RESET / INIT ----------
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGame() {
+            game.player.x = 300; game.player.y = 200;
+            game.totalCollected = 0;
+            game.lives = 5;
+            game.stars = 0;
+            game.currentRoom = 0;
+            game.gameOver = false;
+            game.isRunning = true;
+            game.roomComplete = false;
+            game.usedFacts = [];
+            shuffleArray(historyFacts);
+            generateRoom();
+            updateUI();
+            feedbackMsg.textContent = '🟢 collect 10 orbs to escape this room!';
+        }
+
+        function generateRoom() {
+            game.collectedInRoom = 0;
+            game.orbs = [];
+            game.enemies = [];
+            game.roomComplete = false;
+            const usedPos = [];
+            const roomFactPool = getFactsForRoom(game.currentRoom);
+            
+            for (let i = 0; i < game.orbsPerRoom; i++) {
+                let pos;
+                let attempts = 0;
+                do {
+                    pos = { x: 40 + Math.random() * 520, y: 40 + Math.random() * 320 };
+                    attempts++;
+                } while (attempts < 200 && usedPos.some(p => dist(p, pos) < 45));
+                usedPos.push(pos);
+                const factIndex = (i + game.currentRoom * game.orbsPerRoom) % roomFactPool.length;
+                game.orbs.push({
+                    x: pos.x, y: pos.y,
+                    r: 14,
+                    collected: false,
+                    fact: roomFactPool[factIndex],
+                    index: i
+                });
+            }
+
+            for (let i = 0; i < 2; i++) {
+                spawnEnemy(true);
+            }
+            updateUI();
+        }
+
+        function getFactsForRoom(roomIndex) {
+            const totalFacts = historyFacts.length;
+            const start = (roomIndex * 10) % totalFacts;
+            const end = Math.min(start + 15, totalFacts);
+            const pool = [];
+            for (let i = start; i < end; i++) {
+                pool.push(historyFacts[i % totalFacts]);
+            }
+            while (pool.length < 10) {
+                const extra = historyFacts[Math.floor(Math.random() * totalFacts)];
+                if (!pool.includes(extra)) pool.push(extra);
+            }
+            return shuffleArray(pool);
+        }
+
+        function spawnEnemy(force = false) {
+            if (game.enemies.length >= game.maxEnemies && !force) return;
+            let x, y, safe;
+            let attempts = 0;
+            do {
+                x = 30 + Math.random() * 540;
+                y = 30 + Math.random() * 340;
+                safe = true;
+                if (dist({x,y}, game.player) < 70) safe = false;
+                for (let e of game.enemies) {
+                    if (dist({x,y}, e) < 55) safe = false;
+                }
+                attempts++;
+            } while (!safe && attempts < 100);
+
+            game.enemies.push({
+                x, y,
+                r: 16,
+                speed: 0.5 + Math.random() * 0.3,
+            });
+        }
+
+        function dist(a, b) {
+            return Math.hypot(a.x - b.x, a.y - b.y);
+        }
+
+        // ---------- UPDATE ----------
+        function update() {
+            if (!game.isRunning || game.gameOver || game.roomComplete) return;
+
+            const p = game.player;
+            let dx = 0, dy = 0;
+            if (game.keys.w || game.keys.up) dy -= 1;
+            if (game.keys.s || game.keys.down) dy += 1;
+            if (game.keys.a || game.keys.left) dx -= 1;
+            if (game.keys.d || game.keys.right) dx += 1;
+            if (dx !== 0 && dy !== 0) { dx *= 0.707; dy *= 0.707; }
+            const speed = 3.2;
+            p.x = Math.min(W - p.r, Math.max(p.r, p.x + dx * speed));
+            p.y = Math.min(H - p.r, Math.max(p.r, p.y + dy * speed));
+
+            for (let orb of game.orbs) {
+                if (orb.collected) continue;
+                if (dist(p, orb) < p.r + orb.r) {
+                    orb.collected = true;
+                    game.collectedInRoom++;
+                    game.totalCollected++;
+                    soundOrb();
+                    feedbackMsg.textContent = `📜 ${orb.fact}`;
+                    updateUI();
+                    
+                    if (game.collectedInRoom >= game.orbsPerRoom) {
+                        game.roomComplete = true;
+                        soundRoomComplete();
+                        feedbackMsg.textContent = `🎉 Room ${game.currentRoom + 1} complete! Press Next Room ➡️`;
+                        game.enemies = [];
+                        showNextRoomButton();
+                        return;
+                    }
+                    
+                    if (game.collectedInRoom % 3 === 0 && game.enemies.length < game.maxEnemies) {
+                        spawnEnemy();
+                    }
+                }
+            }
+
+            for (let e of game.enemies) {
+                const angle = Math.atan2(p.y - e.y, p.x - e.x);
+                const noise = (Math.random() - 0.5) * 0.6;
+                const finalAngle = angle + noise;
+                e.x += Math.cos(finalAngle) * e.speed * 1.0;
+                e.y += Math.sin(finalAngle) * e.speed * 1.0;
+
+                if (e.x < e.r) { e.x = e.r; }
+                if (e.x > W - e.r) { e.x = W - e.r; }
+                if (e.y < e.r) { e.y = e.r; }
+                if (e.y > H - e.r) { e.y = H - e.r; }
+
+                for (let other of game.enemies) {
+                    if (other === e) continue;
+                    const d = dist(e, other);
+                    if (d < e.r + other.r + 8) {
+                        const angle2 = Math.atan2(e.y - other.y, e.x - other.x);
+                        const push = 0.6;
+                        e.x += Math.cos(angle2) * push;
+                        e.y += Math.sin(angle2) * push;
+                    }
+                }
+
+                if (dist(p, e) < p.r + e.r) {
+                    game.lives--;
+                    soundHit();
+                    feedbackMsg.textContent = `💥 Hit! -1 ❤️  (${game.lives} left)`;
+                    p.x = 300; p.y = 200;
+                    const idx = game.enemies.indexOf(e);
+                    if (idx > -1) game.enemies.splice(idx, 1);
+                    if (game.enemies.length < game.maxEnemies) {
+                        spawnEnemy(true);
+                    }
+                    updateUI();
+                    if (game.lives <= 0) {
+                        endGame(false);
+                        return;
+                    }
+                }
+            }
+
+            if (game.enemies.length < game.maxEnemies && !game.roomComplete) {
+                spawnEnemy();
+            }
+
+            updateUI();
+        }
+
+        // ---------- NEXT ROOM BUTTON ----------
+        function showNextRoomButton() {
+            const btn = document.createElement('button');
+            btn.textContent = '🚪 Next Room ➡️ (Enter)';
+            btn.className = 'btn';
+            btn.style.position = 'absolute';
+            btn.style.top = '50%';
+            btn.style.left = '50%';
+            btn.style.transform = 'translate(-50%, -50%)';
+            btn.style.zIndex = '10';
+            btn.style.padding = '0.8rem 2.5rem';
+            btn.style.fontSize = '1.5rem';
+            btn.id = 'nextRoomBtn';
+            const wrapper = document.querySelector('.canvas-wrapper');
+            wrapper.style.position = 'relative';
+            wrapper.appendChild(btn);
+            btn.addEventListener('click', () => {
+                btn.remove();
+                nextRoom();
+            });
+            const enterHandler = (e) => {
+                if (e.key === 'Enter') {
+                    const b = document.getElementById('nextRoomBtn');
+                    if (b) {
+                        b.remove();
+                        document.removeEventListener('keydown', enterHandler);
+                        nextRoom();
+                    }
+                }
+            };
+            document.addEventListener('keydown', enterHandler);
+        }
+
+        function nextRoom() {
+            game.currentRoom++;
+            if (game.currentRoom >= game.totalRooms) {
+                endGame(true);
+                return;
+            }
+            generateRoom();
+            game.roomComplete = false;
+            feedbackMsg.textContent = `🚪 Room ${game.currentRoom + 1}: collect 10 orbs!`;
+            updateUI();
+            const oldBtn = document.getElementById('nextRoomBtn');
+            if (oldBtn) oldBtn.remove();
+        }
+
+        // ---------- DRAW ----------
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#1f332b';
+            ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = '#2d4a3d';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < W; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, H);
+                ctx.stroke();
+            }
+            for (let i = 0; i < H; i += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(W, i);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = 'rgba(255,215,0,0.08)';
+            ctx.font = 'bold 60px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`Room ${game.currentRoom+1}`, W/2, H/2 - 10);
+
+            for (let orb of game.orbs) {
+                if (orb.collected) continue;
+                const grad = ctx.createRadialGradient(orb.x-4, orb.y-4, 2, orb.x, orb.y, orb.r+8);
+                grad.addColorStop(0, '#f7d44a');
+                grad.addColorStop(0.7, '#dbb42a');
+                grad.addColorStop(1, '#7f5f1a');
+                ctx.beginPath();
+                ctx.arc(orb.x, orb.y, orb.r, 0, Math.PI*2);
+                ctx.fillStyle = grad;
+                ctx.shadowColor = '#f7d44a';
+                ctx.shadowBlur = 18;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#fff8d0';
+                ctx.beginPath();
+                ctx.arc(orb.x-2, orb.y-3, 4, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#2f2a1a';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(orb.index+1, orb.x, orb.y+1);
+            }
+
+            for (let e of game.enemies) {
+                ctx.shadowColor = '#ff3b3b';
+                ctx.shadowBlur = 22;
+                const grad = ctx.createRadialGradient(e.x-4, e.y-4, 3, e.x, e.y, e.r);
+                grad.addColorStop(0, '#ff5e5e');
+                grad.addColorStop(0.8, '#b11f1f');
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, e.r, 0, Math.PI*2);
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#f5f0e0';
+                ctx.beginPath();
+                ctx.arc(e.x-5, e.y-4, 4, 0, Math.PI*2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x+5, e.y-4, 4, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#1a1a1a';
+                ctx.beginPath();
+                ctx.arc(e.x-6, e.y-6, 2, 0, Math.PI*2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(e.x+4, e.y-6, 2, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#d9c8a0';
+                ctx.fillRect(e.x-5, e.y+2, 3, 4);
+                ctx.fillRect(e.x+2, e.y+2, 3, 4);
+            }
+
+            const p = game.player;
+            ctx.shadowColor = '#7ac7a0';
+            ctx.shadowBlur = 20;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            const grad = ctx.createRadialGradient(p.x-4, p.y-6, 4, p.x, p.y, p.r);
+            grad.addColorStop(0, '#b8f0d0');
+            grad.addColorStop(0.8, '#3d9e7a');
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.shadowBlur = 6;
+            ctx.fillStyle = '#2a6b5a';
+            ctx.fillRect(p.x-14, p.y-14, 28, 6);
+            ctx.fillRect(p.x-6, p.y-20, 12, 8);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#f5f5f0';
+            ctx.beginPath();
+            ctx.arc(p.x-5, p.y-3, 4, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(p.x+5, p.y-3, 4, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = '#1f332b';
+            ctx.beginPath();
+            ctx.arc(p.x-6, p.y-5, 2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(p.x+4, p.y-5, 2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
+        // ---------- UI UPDATE ----------
+        function updateUI() {
+            livesDisplay.textContent = game.lives;
+            orbCountDisplay.textContent = `${game.collectedInRoom} / ${game.orbsPerRoom}`;
+            roomDisplay.textContent = `Room ${game.currentRoom + 1}`;
+            let stars = 0;
+            const totalPossible = game.totalRooms * game.orbsPerRoom;
+            const ratio = game.totalCollected / totalPossible;
+            if (ratio >= 0.9) stars = 3;
+            else if (ratio >= 0.6) stars = 2;
+            else if (ratio >= 0.3) stars = 1;
+            game.stars = stars;
+            const filled = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+            starsDisplay.textContent = filled;
+        }
+
+        // ---------- GAME LOOP ----------
+        function gameLoop() {
+            update();
+            draw();
+            game.animFrame = requestAnimationFrame(gameLoop);
+        }
+
+        // ---------- END GAME ----------
+        function endGame(win) {
+            if (game.gameOver) return;
+            game.isRunning = false;
+            game.gameOver = true;
+            stopBgMusic();
+            if (game.animFrame) cancelAnimationFrame(game.animFrame);
+
+            const oldBtn = document.getElementById('nextRoomBtn');
+            if (oldBtn) oldBtn.remove();
+
+            if (win) {
+                soundWin();
+                endTitle.textContent = '🏆 YOU ESCAPED!';
+                feedbackMsg.textContent = '🎉 All 10 rooms completed! Malaysia history master!';
+            } else {
+                soundLose();
+                endTitle.textContent = '💀 GAME OVER';
+                feedbackMsg.textContent = '😵 You ran out of lives. Try again!';
+            }
+
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalOrbs.textContent = `${game.totalCollected} / ${game.totalRooms * game.orbsPerRoom}`;
+            const starStr = '★'.repeat(game.stars) + '☆'.repeat(3 - game.stars);
+            finalStars.textContent = starStr;
+            finalStarsBig.textContent = starStr;
+            finalLives.textContent = game.lives;
+            finalRooms.textContent = `${game.currentRoom + (win ? 1 : 0)} / ${game.totalRooms}`;
+        }
+
+        // ---------- RESET ----------
+        function resetAndStart() {
+            stopBgMusic();
+            if (game.animFrame) cancelAnimationFrame(game.animFrame);
+            endScreen.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            const oldBtn = document.getElementById('nextRoomBtn');
+            if (oldBtn) oldBtn.remove();
+            initGame();
+            startBgMusic();
+            gameLoop();
+        }
+
+        // ---------- EVENTS ----------
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'w') game.keys.w = true;
+            if (key === 'a') game.keys.a = true;
+            if (key === 's') game.keys.s = true;
+            if (key === 'd') game.keys.d = true;
+            if (key === 'arrowup') { game.keys.up = true; e.preventDefault(); }
+            if (key === 'arrowdown') { game.keys.down = true; e.preventDefault(); }
+            if (key === 'arrowleft') { game.keys.left = true; e.preventDefault(); }
+            if (key === 'arrowright') { game.keys.right = true; e.preventDefault(); }
+            if (key === 'enter') {
+                const btn = document.getElementById('nextRoomBtn');
+                if (btn) btn.click();
+            }
+        });
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'w') game.keys.w = false;
+            if (key === 'a') game.keys.a = false;
+            if (key === 's') game.keys.s = false;
+            if (key === 'd') game.keys.d = false;
+            if (key === 'arrowup') { game.keys.up = false; e.preventDefault(); }
+            if (key === 'arrowdown') { game.keys.down = false; e.preventDefault(); }
+            if (key === 'arrowleft') { game.keys.left = false; e.preventDefault(); }
+            if (key === 'arrowright') { game.keys.right = false; e.preventDefault(); }
+        });
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            initAudio();
+            resetAndStart();
+        });
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            initAudio();
+            resetAndStart();
+        });
+
+        canvas.addEventListener('click', () => canvas.focus());
+        canvas.setAttribute('tabindex', '0');
+
+        startScreen.classList.remove('hidden');
+        gameScreen.classList.add('hidden');
+        endScreen.classList.add('hidden');
+        starsDisplay.textContent = '☆☆☆';
+        document.addEventListener('click', () => initAudio(), { once: true });
+
+        window.addEventListener('keydown', (e) => {
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+    })();
+</script>
+</body>
+</html>
