@@ -101,7 +101,7 @@ This game can be hosted easily using:
 ---
 ## 🌐 Preview Link
 
-
+https://tky2006.github.io/Malaysia-History-Escape-Room/
 
 ## 📌 Future Improvements
 
