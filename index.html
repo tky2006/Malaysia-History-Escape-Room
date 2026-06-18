@@ -249,6 +249,71 @@
             text-align: center;
             margin: 0.5rem 0;
         }
+
+        /* room summary overlay */
+        .summary-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            color: #f5efe0;
+            z-index: 20;
+            text-align: center;
+        }
+        .summary-overlay h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+            color: #f7e3b2;
+        }
+        .summary-overlay .fact-list {
+            max-height: 160px;
+            overflow-y: auto;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            padding: 0.5rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 1.5rem;
+            margin: 0.3rem 0 0.5rem;
+            border: 1px solid #b8945c;
+            scrollbar-width: thin;
+            scrollbar-color: #b8945c #1d2d27;
+        }
+        .summary-overlay .fact-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .summary-overlay .fact-list::-webkit-scrollbar-track {
+            background: #1d2d27;
+        }
+        .summary-overlay .fact-list::-webkit-scrollbar-thumb {
+            background: #b8945c;
+            border-radius: 20px;
+        }
+        .summary-overlay .fact-item {
+            padding: 0.2rem 0;
+            border-bottom: 1px dashed #4a6b5a;
+            display: flex;
+            gap: 8px;
+        }
+        .summary-overlay .fact-item:last-child { border: none; }
+        .summary-overlay .fact-num {
+            font-weight: 700;
+            color: #dbb47a;
+            min-width: 24px;
+        }
+        .summary-overlay .btn {
+            margin-top: 0.5rem;
+            padding: 0.5rem 2.5rem;
+            font-size: 1.3rem;
+        }
     </style>
 </head>
 <body>
@@ -313,7 +378,6 @@
             if (!audioCtx) audioCtx = new AudioContext();
         }
 
-        // Helper: play tone with volume control
         function playTone(freq, duration, type = 'sine', volume = 0.2) {
             try {
                 initAudio();
@@ -330,7 +394,6 @@
             } catch (_) {}
         }
 
-        // SFX: louder (volume ~0.25-0.35)
         function soundOrb() { 
             playTone(880, 0.2, 'sine', 0.3); 
             setTimeout(() => playTone(1100, 0.15, 'sine', 0.25), 120); 
@@ -344,14 +407,11 @@
         }
         function soundLose() { playTone(300, 0.6, 'square', 0.2); }
 
-        // ---------- BACKGROUND MUSIC (medium volume, lower than SFX) ----------
         let bgInterval = null;
         function startBgMusic() {
             stopBgMusic();
             let noteIndex = 0;
-            // A simple, calming melody in C major
             const melody = [523, 587, 659, 784, 659, 587, 523, 440, 523, 587, 659, 784, 880, 784, 659, 587];
-            // BG volume = 0.08 (medium-low, clearly lower than SFX which are 0.2-0.3)
             const bgVolume = 0.18;
             bgInterval = setInterval(() => {
                 if (!audioCtx) return;
@@ -373,7 +433,6 @@
         const ctx = canvas.getContext('2d');
         const W = 600, H = 400;
 
-        // DOM refs
         const startScreen = document.getElementById('startScreen');
         const gameScreen = document.getElementById('gameScreen');
         const endScreen = document.getElementById('endScreen');
@@ -389,7 +448,7 @@
         const finalStarsBig = document.getElementById('finalStarsBig');
         const endTitle = document.getElementById('endTitle');
 
-        // ---------- LARGE HISTORY FACT POOL (150+ facts) ----------
+        // ---------- HISTORY FACTS (150+) ----------
         const historyFacts = [
             "The Malay Peninsula was home to ancient kingdoms like Langkasuka (2nd century).",
             "Srivijaya, a powerful maritime empire, controlled the Straits of Malacca.",
@@ -559,9 +618,11 @@
             animFrame: null,
             maxEnemies: 2,
             usedFacts: [],
+            // store facts collected per room for summary
+            roomFactLog: [],
         };
 
-        // ---------- RESET / INIT ----------
+        // ---------- HELPERS ----------
         function shuffleArray(arr) {
             for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -570,6 +631,11 @@
             return arr;
         }
 
+        function dist(a, b) {
+            return Math.hypot(a.x - b.x, a.y - b.y);
+        }
+
+        // ---------- INIT / RESET ----------
         function initGame() {
             game.player.x = 300; game.player.y = 200;
             game.totalCollected = 0;
@@ -580,10 +646,26 @@
             game.isRunning = true;
             game.roomComplete = false;
             game.usedFacts = [];
+            game.roomFactLog = [];
             shuffleArray(historyFacts);
             generateRoom();
             updateUI();
             feedbackMsg.textContent = '🟢 collect 10 orbs to escape this room!';
+        }
+
+        function getFactsForRoom(roomIndex) {
+            const totalFacts = historyFacts.length;
+            const start = (roomIndex * 10) % totalFacts;
+            const end = Math.min(start + 15, totalFacts);
+            const pool = [];
+            for (let i = start; i < end; i++) {
+                pool.push(historyFacts[i % totalFacts]);
+            }
+            while (pool.length < 10) {
+                const extra = historyFacts[Math.floor(Math.random() * totalFacts)];
+                if (!pool.includes(extra)) pool.push(extra);
+            }
+            return shuffleArray(pool);
         }
 
         function generateRoom() {
@@ -618,21 +700,6 @@
             updateUI();
         }
 
-        function getFactsForRoom(roomIndex) {
-            const totalFacts = historyFacts.length;
-            const start = (roomIndex * 10) % totalFacts;
-            const end = Math.min(start + 15, totalFacts);
-            const pool = [];
-            for (let i = start; i < end; i++) {
-                pool.push(historyFacts[i % totalFacts]);
-            }
-            while (pool.length < 10) {
-                const extra = historyFacts[Math.floor(Math.random() * totalFacts)];
-                if (!pool.includes(extra)) pool.push(extra);
-            }
-            return shuffleArray(pool);
-        }
-
         function spawnEnemy(force = false) {
             if (game.enemies.length >= game.maxEnemies && !force) return;
             let x, y, safe;
@@ -653,10 +720,6 @@
                 r: 16,
                 speed: 0.5 + Math.random() * 0.3,
             });
-        }
-
-        function dist(a, b) {
-            return Math.hypot(a.x - b.x, a.y - b.y);
         }
 
         // ---------- UPDATE ----------
@@ -680,6 +743,8 @@
                     orb.collected = true;
                     game.collectedInRoom++;
                     game.totalCollected++;
+                    // store fact for summary
+                    game.roomFactLog.push(orb.fact);
                     soundOrb();
                     feedbackMsg.textContent = `📜 ${orb.fact}`;
                     updateUI();
@@ -687,9 +752,10 @@
                     if (game.collectedInRoom >= game.orbsPerRoom) {
                         game.roomComplete = true;
                         soundRoomComplete();
-                        feedbackMsg.textContent = `🎉 Room ${game.currentRoom + 1} complete! Press Next Room ➡️`;
+                        feedbackMsg.textContent = `🎉 Room ${game.currentRoom + 1} complete!`;
                         game.enemies = [];
-                        showNextRoomButton();
+                        // show summary overlay with all facts from this room
+                        showRoomSummary();
                         return;
                     }
                     
@@ -747,33 +813,45 @@
             updateUI();
         }
 
-        // ---------- NEXT ROOM BUTTON ----------
-        function showNextRoomButton() {
-            const btn = document.createElement('button');
-            btn.textContent = '🚪 Next Room ➡️ (Enter)';
-            btn.className = 'btn';
-            btn.style.position = 'absolute';
-            btn.style.top = '50%';
-            btn.style.left = '50%';
-            btn.style.transform = 'translate(-50%, -50%)';
-            btn.style.zIndex = '10';
-            btn.style.padding = '0.8rem 2.5rem';
-            btn.style.fontSize = '1.5rem';
-            btn.id = 'nextRoomBtn';
+        // ---------- ROOM SUMMARY OVERLAY ----------
+        function showRoomSummary() {
+            // remove any existing summary
             const wrapper = document.querySelector('.canvas-wrapper');
+            const old = wrapper.querySelector('.summary-overlay');
+            if (old) old.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'summary-overlay';
+            overlay.innerHTML = `
+                <h2>📖 Room ${game.currentRoom + 1} Facts</h2>
+                <div class="fact-list" id="summaryFactList"></div>
+                <button class="btn" id="summaryNextBtn">🚪 Next Room ➡️</button>
+            `;
             wrapper.style.position = 'relative';
-            wrapper.appendChild(btn);
-            btn.addEventListener('click', () => {
-                btn.remove();
+            wrapper.appendChild(overlay);
+
+            const list = overlay.querySelector('#summaryFactList');
+            // get the facts collected in this room (from log, last 10 or however many)
+            const roomFacts = game.roomFactLog.slice(-game.orbsPerRoom);
+            roomFacts.forEach((fact, idx) => {
+                const div = document.createElement('div');
+                div.className = 'fact-item';
+                div.innerHTML = `<span class="fact-num">#${idx+1}</span><span>${fact}</span>`;
+                list.appendChild(div);
+            });
+
+            overlay.querySelector('#summaryNextBtn').addEventListener('click', () => {
+                overlay.remove();
                 nextRoom();
             });
+
+            // also allow Enter key to continue
             const enterHandler = (e) => {
                 if (e.key === 'Enter') {
-                    const b = document.getElementById('nextRoomBtn');
-                    if (b) {
-                        b.remove();
+                    const btn = document.getElementById('summaryNextBtn');
+                    if (btn) {
+                        btn.click();
                         document.removeEventListener('keydown', enterHandler);
-                        nextRoom();
                     }
                 }
             };
@@ -790,8 +868,10 @@
             game.roomComplete = false;
             feedbackMsg.textContent = `🚪 Room ${game.currentRoom + 1}: collect 10 orbs!`;
             updateUI();
-            const oldBtn = document.getElementById('nextRoomBtn');
-            if (oldBtn) oldBtn.remove();
+            // remove any leftover summary overlay
+            const wrapper = document.querySelector('.canvas-wrapper');
+            const old = wrapper.querySelector('.summary-overlay');
+            if (old) old.remove();
         }
 
         // ---------- DRAW ----------
@@ -937,8 +1017,10 @@
             stopBgMusic();
             if (game.animFrame) cancelAnimationFrame(game.animFrame);
 
-            const oldBtn = document.getElementById('nextRoomBtn');
-            if (oldBtn) oldBtn.remove();
+            // remove any summary overlay
+            const wrapper = document.querySelector('.canvas-wrapper');
+            const old = wrapper.querySelector('.summary-overlay');
+            if (old) old.remove();
 
             if (win) {
                 soundWin();
@@ -967,8 +1049,9 @@
             endScreen.classList.add('hidden');
             startScreen.classList.add('hidden');
             gameScreen.classList.remove('hidden');
-            const oldBtn = document.getElementById('nextRoomBtn');
-            if (oldBtn) oldBtn.remove();
+            const wrapper = document.querySelector('.canvas-wrapper');
+            const old = wrapper.querySelector('.summary-overlay');
+            if (old) old.remove();
             initGame();
             startBgMusic();
             gameLoop();
@@ -986,7 +1069,7 @@
             if (key === 'arrowleft') { game.keys.left = true; e.preventDefault(); }
             if (key === 'arrowright') { game.keys.right = true; e.preventDefault(); }
             if (key === 'enter') {
-                const btn = document.getElementById('nextRoomBtn');
+                const btn = document.getElementById('summaryNextBtn');
                 if (btn) btn.click();
             }
         });
